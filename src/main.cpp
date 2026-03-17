@@ -25,7 +25,7 @@
 #define DEFAULT_SPAWN_EXITS_COUNT 1
 
 const char *SCREENSHOTS_DIR_PATH = "/by_chillyc0de/MiniMaze/screenshots/";
-const char *FIRMWARE_VERSION = "v1.0.0";
+const char *FIRMWARE_VERSION = "v1.0.1";
 
 const int SCREEN_WIDTH = 240;
 const int SCREEN_HEIGHT = 135;
@@ -51,12 +51,15 @@ struct MazeConfig {
     int h;
     int s;
 };
-const std::vector<MazeConfig> MAZE_PRESETS = {
+
+const MazeConfig MAZE_PRESETS[] = {
     {21, 11, 11},
     {27, 15, 9},
     {33, 19, 7},
     {47, 27, 5},
 };
+const int mazePresetsSize = sizeof(MAZE_PRESETS) / sizeof(MAZE_PRESETS[0]);
+
 enum MazeCell : uint8_t {
     CELL_EMPTY,
     CELL_WALL,
@@ -64,7 +67,7 @@ enum MazeCell : uint8_t {
     CELL_EXIT,
 };
 
-const std::vector<String> userGuideLines = {
+const String userGuideLines[] = {
     "============= MINI MAZE =============",
     " Created by chillyc0de.",
     " Assisted by Google Gemini (LLM).",
@@ -100,6 +103,7 @@ const std::vector<String> userGuideLines = {
     " is not responsible for any bugs",
     " or SD card data loss.",
 };
+const int userGuideLinesSize = sizeof(userGuideLines) / sizeof(userGuideLines[0]);
 
 enum ExternalState : uint8_t {
     STATE_SPLASH_SCREEN,
@@ -592,7 +596,7 @@ struct MenuOption {
     std::function<void()> action;
 };
 
-const std::vector<MenuOption> mainMenuOptions = {
+const MenuOption mainMenuOptions[] = {
     {
         "Play game",
         []() {
@@ -609,8 +613,9 @@ const std::vector<MenuOption> mainMenuOptions = {
         },
     },
 };
+const int mainMenuOptionsSize = sizeof(mainMenuOptions) / sizeof(mainMenuOptions[0]);
 
-const std::vector<MenuOption> settingsMenuOptions = {
+const MenuOption settingsMenuOptions[] = {
     {
         "Game setup",
         []() {
@@ -636,6 +641,7 @@ const std::vector<MenuOption> settingsMenuOptions = {
         },
     },
 };
+const int settingsMenuOptionsSize = sizeof(settingsMenuOptions) / sizeof(settingsMenuOptions[0]);
 
 // --- ФУНКЦИИ ДЛЯ РАБОТЫ С ДАННЫМИ ---
 void ensureDirectoryExists(const char *dirPath, bool isFilePath = false) {
@@ -666,7 +672,7 @@ void ensureDirectoryExists(const char *dirPath, bool isFilePath = false) {
 }
 
 // --- ОТРИСОВКА ВСПОМОГАТЕЛЬНЫХ ЭЛЕМЕНТОВ ---
-void drawHeader(String title, String rightText = "") {
+void drawHeader(const String &title, const String &rightText = "") {
     displaySprite.fillRect(0, 0, SCREEN_WIDTH, 24, UI_ACCENT);
     displaySprite.setTextColor(UI_FG);
 
@@ -919,7 +925,7 @@ void renderSplashScreen() {
 void renderGuideScreen() {
     displaySprite.fillSprite(UI_BG);
     drawHeader("GUIDE");
-    drawScrollbar(internalState.guideScrollY / 18, (SCREEN_HEIGHT - 44) / 18, userGuideLines.size(), 26, SCREEN_HEIGHT - 44);
+    drawScrollbar(internalState.guideScrollY / 18, (SCREEN_HEIGHT - 44) / 18, userGuideLinesSize, 26, SCREEN_HEIGHT - 44);
     drawFooter({"   [Esc]: Back      [Arrows]: Scroll"});
 
     displaySprite.setClipRect(0, 26, SCREEN_WIDTH - 5, SCREEN_HEIGHT - 44);
@@ -928,7 +934,7 @@ void renderGuideScreen() {
     displaySprite.setTextDatum(top_left);
     displaySprite.setFont(&fonts::Font2);
 
-    for (int i = 0; i < userGuideLines.size(); i++) {
+    for (int i = 0; i < userGuideLinesSize; i++) {
         int yPos = 30 + (i * 18) - internalState.guideScrollY;
         if (yPos > -18 && yPos < SCREEN_HEIGHT) displaySprite.drawString(userGuideLines[i], 5 - internalState.guideScrollX, yPos);
     }
@@ -938,7 +944,7 @@ void renderGuideScreen() {
 void renderMainMenuScreen() {
     displaySprite.fillSprite(UI_BG);
     drawHeader("MAIN MENU");
-    drawScrollbar(internalState.mainMenuScrollOffset, 4, mainMenuOptions.size(), 32, 4 * 20);
+    drawScrollbar(internalState.mainMenuScrollOffset, 4, mainMenuOptionsSize, 32, 4 * 20);
     drawFooter({" [Esc]: Guide [Arrows]:Mov [Enter]: Sel"});
 
     displaySprite.setTextColor(UI_FG);
@@ -946,7 +952,7 @@ void renderMainMenuScreen() {
 
     for (int i = 0; i < 4; i++) {
         int itemIdx = internalState.mainMenuScrollOffset + i;
-        if (itemIdx >= mainMenuOptions.size()) break; // Если пунктов меньше 4, выходим раньше
+        if (itemIdx >= mainMenuOptionsSize) break; // Если пунктов меньше 4, выходим раньше
 
         bool isSel = (itemIdx == internalState.mainMenuSelectedIndex);
         int yPos = 32 + (i * 20); // i от 0 до 3 (позиция на экране)
@@ -990,7 +996,7 @@ void renderGameAreaScreen() {
 void renderSettingsMenuScreen() {
     displaySprite.fillSprite(UI_BG);
     drawHeader("SETTINGS");
-    drawScrollbar(internalState.settingsMenuScrollOffset, 4, settingsMenuOptions.size(), 32, 4 * 20);
+    drawScrollbar(internalState.settingsMenuScrollOffset, 4, settingsMenuOptionsSize, 32, 4 * 20);
     drawFooter({" [Esc]: Back [Arrows]: Mov [Enter]: Sel"});
 
     displaySprite.setTextColor(UI_FG);
@@ -998,7 +1004,7 @@ void renderSettingsMenuScreen() {
 
     for (int i = 0; i < 4; i++) {
         int itemIdx = internalState.settingsMenuScrollOffset + i;
-        if (itemIdx >= settingsMenuOptions.size()) break; // Если пунктов меньше 4, выходим раньше
+        if (itemIdx >= settingsMenuOptionsSize) break; // Если пунктов меньше 4, выходим раньше
 
         bool isSel = (itemIdx == internalState.settingsMenuSelectedIndex);
         int yPos = 32 + (i * 20); // i от 0 до 3 (позиция на экране)
@@ -1156,11 +1162,11 @@ void handleGuideInput(Keyboard_Class::KeysState kState, char kChar, bool isChang
 
     // Расчет вертикального максимума
     int fontHeight = 18; // Высота символа Font0
-    int maxScrollY = max(0, (int)(userGuideLines.size() * fontHeight) - 85);
+    int maxScrollY = max(0, userGuideLinesSize * fontHeight - 85);
 
     // Расчет горизонтального максимума
     int maxChars = 0;
-    for (const auto &line : userGuideLines)
+    for (const String &line : userGuideLines)
         if (line.length() > maxChars) maxChars = line.length();
 
     int fontWidth = 10; // Ширина символа Font0
@@ -1192,7 +1198,7 @@ void handleMainMenuInput(Keyboard_Class::KeysState kState, char kChar, bool isCh
             internalState.mainMenuSelectedIndex--;
         } else {
             // Прыжок с первого на последний
-            internalState.mainMenuSelectedIndex = mainMenuOptions.size() - 1;
+            internalState.mainMenuSelectedIndex = mainMenuOptionsSize - 1;
         }
 
         // Корректировка скролла в видимой области (4 пункта)
@@ -1201,7 +1207,7 @@ void handleMainMenuInput(Keyboard_Class::KeysState kState, char kChar, bool isCh
             internalState.mainMenuScrollOffset = internalState.mainMenuSelectedIndex;
         } else if (internalState.mainMenuSelectedIndex >= internalState.mainMenuScrollOffset + 4) {
             // Если перепрыгнули в самый конец, показываем последние 4 элемента
-            int newOffset = (int)mainMenuOptions.size() - 4;
+            int newOffset = mainMenuOptionsSize - 4;
             internalState.mainMenuScrollOffset = (newOffset > 0) ? newOffset : 0;
         }
         internalState.requiresRedraw = true;
@@ -1209,7 +1215,7 @@ void handleMainMenuInput(Keyboard_Class::KeysState kState, char kChar, bool isCh
     }
     // Down or Right
     if (kChar == '.' || kChar == '/') {
-        if (internalState.mainMenuSelectedIndex < (int)mainMenuOptions.size() - 1) {
+        if (internalState.mainMenuSelectedIndex < mainMenuOptionsSize - 1) {
             internalState.mainMenuSelectedIndex++;
         } else {
             // Прыжок с последнего на первый
@@ -1269,7 +1275,7 @@ void handleGameAreaInput(Keyboard_Class::KeysState kState, char kChar, bool isCh
     if (isChange && (lkChar == '-' || lkChar == '[')) {
         // Переключение по кругу назад
         internalState.mazePresetIndex = (internalState.mazePresetIndex == 0)
-            ? MAZE_PRESETS.size() - 1
+            ? mazePresetsSize - 1
             : internalState.mazePresetIndex - 1;
         internalState.mazeWidth = MAZE_PRESETS[internalState.mazePresetIndex].w;
         internalState.mazeHeight = MAZE_PRESETS[internalState.mazePresetIndex].h;
@@ -1285,7 +1291,7 @@ void handleGameAreaInput(Keyboard_Class::KeysState kState, char kChar, bool isCh
     // '=' or ']'
     if (isChange && (lkChar == '=' || lkChar == ']')) {
         // Переключение по кругу вперед
-        internalState.mazePresetIndex = (internalState.mazePresetIndex + 1) % MAZE_PRESETS.size();
+        internalState.mazePresetIndex = (internalState.mazePresetIndex + 1) % mazePresetsSize;
         internalState.mazeWidth = MAZE_PRESETS[internalState.mazePresetIndex].w;
         internalState.mazeHeight = MAZE_PRESETS[internalState.mazePresetIndex].h;
         internalState.mazeCellSize = MAZE_PRESETS[internalState.mazePresetIndex].s;
@@ -1334,7 +1340,7 @@ void handleGameAreaInput(Keyboard_Class::KeysState kState, char kChar, bool isCh
 
         // Двигаем найденных игроков
         MazeCell highestCellType = CELL_EMPTY;
-        for (auto &pos : playerCells) {
+        for (std::pair<int, int> &pos : playerCells) {
             int x = pos.first;
             int y = pos.second;
 
@@ -1408,7 +1414,7 @@ void handleSettingsMenuInput(Keyboard_Class::KeysState kState, char kChar, bool 
             internalState.settingsMenuSelectedIndex--;
         } else {
             // Прыжок с первого на последний
-            internalState.settingsMenuSelectedIndex = settingsMenuOptions.size() - 1;
+            internalState.settingsMenuSelectedIndex = settingsMenuOptionsSize - 1;
         }
 
         // Корректировка скролла в видимой области (4 пункта)
@@ -1417,7 +1423,7 @@ void handleSettingsMenuInput(Keyboard_Class::KeysState kState, char kChar, bool 
             internalState.settingsMenuScrollOffset = internalState.settingsMenuSelectedIndex;
         } else if (internalState.settingsMenuSelectedIndex >= internalState.settingsMenuScrollOffset + 4) {
             // Если перепрыгнули в самый конец, показываем последние 4 элемента
-            int newOffset = (int)settingsMenuOptions.size() - 4;
+            int newOffset = settingsMenuOptionsSize - 4;
             internalState.settingsMenuScrollOffset = (newOffset > 0) ? newOffset : 0;
         }
         internalState.requiresRedraw = true;
@@ -1425,7 +1431,7 @@ void handleSettingsMenuInput(Keyboard_Class::KeysState kState, char kChar, bool 
     }
     // Down or Right
     if (kChar == '.' || kChar == '/') {
-        if (internalState.settingsMenuSelectedIndex < (int)settingsMenuOptions.size() - 1) {
+        if (internalState.settingsMenuSelectedIndex < settingsMenuOptionsSize - 1) {
             internalState.settingsMenuSelectedIndex++;
         } else {
             // Прыжок с последнего на первый
@@ -1476,7 +1482,7 @@ void handleGameSetupInput(Keyboard_Class::KeysState kState, char kChar, bool isC
         switch (internalState.gameSetupFieldIdx) {
         case 0: // Пресет размеров лабиринта (по кругу назад)
             internalState.mazePresetIndex = (internalState.mazePresetIndex == 0)
-                ? MAZE_PRESETS.size() - 1
+                ? mazePresetsSize - 1
                 : internalState.mazePresetIndex - 1;
             internalState.mazeWidth = MAZE_PRESETS[internalState.mazePresetIndex].w;
             internalState.mazeHeight = MAZE_PRESETS[internalState.mazePresetIndex].h;
@@ -1496,7 +1502,7 @@ void handleGameSetupInput(Keyboard_Class::KeysState kState, char kChar, bool isC
     if (kChar == '.' || kChar == '/') {
         switch (internalState.gameSetupFieldIdx) {
         case 0: // Пресет размеров лабиринта (по кругу вперед)
-            internalState.mazePresetIndex = (internalState.mazePresetIndex + 1) % MAZE_PRESETS.size();
+            internalState.mazePresetIndex = (internalState.mazePresetIndex + 1) % mazePresetsSize;
             internalState.mazeWidth = MAZE_PRESETS[internalState.mazePresetIndex].w;
             internalState.mazeHeight = MAZE_PRESETS[internalState.mazePresetIndex].h;
             internalState.mazeCellSize = MAZE_PRESETS[internalState.mazePresetIndex].s;
@@ -1694,7 +1700,7 @@ void processKeyboardEvents() {
     if (!isPressed) return; // Нет нажатия, нечего обрабатывать
 
     // Модификатор
-    auto kState = M5Cardputer.Keyboard.keysState();
+    Keyboard_Class::KeysState kState = M5Cardputer.Keyboard.keysState();
     // Символ
     char kChar = kState.word.size() > 0 ? kState.word[0] : 0;
 
@@ -1910,7 +1916,7 @@ void processScreenshotEvent() {
     for (int y = 0; y < SCREEN_HEIGHT; y++) {
         int pos = 0;
         for (int x = 0; x < SCREEN_WIDTH; x++) {
-            int color = displaySprite.readPixel(x, y);
+            uint16_t color = displaySprite.readPixel(x, y);
             lineBuffer[pos++] = (color & 0x001F) << 3; // B
             lineBuffer[pos++] = (color & 0x07E0) >> 3; // G
             lineBuffer[pos++] = (color & 0xF800) >> 8; // R
