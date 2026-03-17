@@ -1,0 +1,12 @@
+========================================================================
+Third-Party Software Notices and Licenses
+========================================================================
+This project ("MiniMaze for M5Stack Cardputer ADV") incorporates 
+software from the following third-party works. The licenses and copyright 
+notices for these works are reproduced below.
+
+------------------------------------------------------------------------
+1. M5Cardputer SDK
+------------------------------------------------------------------------
+Copyright (c) M5Stack.
+Used as the hardware abstraction layer for the M5Stack Cardputer device.

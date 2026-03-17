@@ -1,0 +1,40 @@
+---
+Language: Cpp
+BasedOnStyle: LLVM
+
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ColumnLimit: 0
+
+# Основной стиль скобок
+BreakBeforeBraces: Custom
+BraceWrapping:
+AfterFunction: true
+AfterControlStatement: true
+AfterClass: true
+AfterEnum: true
+AfterNamespace: true
+AfterStruct: true
+AfterUnion: true
+BeforeElse: true
+BeforeLambdaBody: false
+SplitEmptyFunction: false
+
+# Компактность функций и блоков
+AllowShortIfStatementsOnASingleLine: AllIfsAndElse
+AllowShortLoopsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: All
+AllowShortBlocksOnASingleLine: Always
+AllowShortLambdasOnASingleLine: All
+
+# Настройки списков
+Cpp11BracedListStyle: true
+BinPackParameters: true
+BinPackArguments: true
+
+# Укрощение отступов
+AlignOperands: false
+AlignAfterOpenBracket: DontAlign
+ContinuationIndentWidth: 4
+---
